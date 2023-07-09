@@ -1,133 +1,74 @@
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var morgan= require('morgan');
-var User = require('./models/user');
-var hbs = require('express-handlebars');
-var bodyParser = require('body-parser');
-var express = require('express');
-var path=require('path');
+const express = require('express');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const moment = require('moment');
+const bodyParser = require('body-parser');
+const path = require('path');
+const hbs = require('express-handlebars');
 
-var app = express();
-app.set('port', 9000);
+const app = express();
+const port = 9000;
+
+app.set('port', port);
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({
+app.use(
+  session({
     key: 'user_sid',
-    secret:'somesecret',
-    resave:false,
-    saveUninitialized:false,
-    cookie:{
-        expires:600000
-    }
-}));
+    secret: 'somesecret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      expires: 600000,
+    },
+  })
+);
 
-
-app.engine('hbs', hbs.engine({extname:'hbs', defaultLayout: 'layout', layoutsDir: __dirname +
- '/views/layouts'}));
- app.set('view engine', 'hbs');
-
-
-
- app.use((req, res, next)=> {
-    if(req.cookies.user_sid && !req.session.user){
-        res.clearCookie('user_sid');
-    }
-    next();
- });
-
-var hbsContent = {userName: '', loggedin:false, title :"You are not logged in", body: "Hello" };
-
-var sessionChecker = (req, res, next) => {
-    if(req.session.user && req.cookies.user_sid){
-        res.redirect('/dashboard');
-    } else{
-        next();
-    }
-};
-
-app.get('/', sessionChecker, (req, res)=>{
-   // res.redirect('/login')
-   res.redirect('/dashboard')
-});
-
-
-app.route('/signup')
-.get((req, res)=>{
-    res.render('signup', hbsContent);
+app.engine(
+  'hbs',
+  hbs.engine({ extname: 'hbs', defaultLayout: 'layout', layoutsDir: path.join(__dirname, '/views/layouts'),
+  helpers: {
+    moment: function (date) {
+      return moment(date).format('DD/MM/YYYY');
+    },
+  },
 })
-.post((req, res)=>{
-    User.create({
-        username: req.body.username,
-        password: req.body.password
-    })
-    .then(user =>{
-        req.session.user = user.dataValues;
-        res.redirect('./dashboard');
-    })
-    .catch(error =>{
-        res.redirect('/signup');
-    });
+);
+app.set('view engine', 'hbs');
+
+app.use((req, res, next) => {
+  if (req.cookies.user_sid && !req.session.user) {
+    res.clearCookie('user_sid');
+  }
+  next();
 });
 
+const sessionChecker = require('./middlewares/sessionChecker');
 
-app.route('/login')
-.get((req, res)=>{
-    res.render('login', hbsContent);
-})
-.post((req, res)=>{
-    var username = req.body.username;
-    var password = req.body.password;
-
-    User.findOne({ where: {username: username}}).then(function(user){
-        if(!user){
-            res.redirect('/login');
-        }else if(!user.validPassword(password)){
-            res.redirect('/login');
-        }else{
-            req.session.user = user.dataValues;
-            res.redirect('/dashboard');
-        }
-
-    });
-
+app.get('/', sessionChecker, (req, res) => {
+  res.redirect('/home');
 });
 
+const signupController = require('./controllers/signupController');
+const loginController = require('./controllers/loginController');
+const homeController = require('./controllers/homeController');
+const logoutController = require('./controllers/logoutController');
+const dashboardController = require('./controllers/dashboardController');
+const articleRoutes = require('./routes/articles');
 
-app.get('/dashboard', (req,res)=>{
-    if(req.session.user && req.cookies.user_sid){
-        hbsContent.loggedin=true;
-        hbsContent.userName = req.session.user.username;
-        hbsContent.title = "You are logged in";
-        res.render('index', hbsContent);
-    }else{
-        res.render('index', hbsContent);
-    }
-    
-    /*else{
-        res.redirect('/login');
-    }*/
+
+app.use('/signup', signupController);
+app.use('/login', loginController);
+app.use('/home', homeController);
+app.use('/logout', logoutController);
+app.use('/dashboard', dashboardController);
+app.use('/articles', articleRoutes);
+
+
+app.use((req, res, next) => {
+  res.status(404).send('Page not found');
 });
 
-app.get('/logout', (req,res)=>{
-    if(req.session.user && req.cookies.user_sid){
-        hbsContent.loggedin=false;
-        hbsContent.title = "You are logged out";
-        res.clearCookie('user_sid');
-        res.redirect('/');
-       
-    }else{
-        res.redirect('/login');
-    }
-});
-
-
-app.use(function(req,res,next){
-    res.status(404).send("Page not found");
-});
-
-
-app.listen(app.get('port'), () => console.log(`App started on port ${app.get('port')}`));
-
-
-
+app.listen(port, () => console.log(`App started on port ${port}`));

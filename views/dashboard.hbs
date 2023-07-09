@@ -1,0 +1,28 @@
+<div class="container">
+
+<div class="text-end">
+  <a class="btn btn-info btn-sm mt-3 mb-3" href="/articles/create" style="color: white;">Create a new blog post</a>
+</div>
+
+
+<h5 class="text-center text-light bg-secondary mb-3">Blog posts created by me</h5>
+
+ 
+  <div class="row">
+    {{#each articles}}
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <div class="card-header" style="position: relative;">
+          <h4>{{this.dataValues.title}}
+          <small class="text-muted" style="position: absolute;  right: 0; font-size: 14px;">
+            Posted by {{this.dataValues.user.dataValues.username}} on {{moment this.dataValues.createdAt format="DD/MM/YYYY"}}
+          </small></h4>
+        </div>
+        <div class="card-body">
+          <p>{{this.dataValues.content}}</p>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
