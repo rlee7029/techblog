@@ -18,5 +18,7 @@ const Comment = db.define('comment', {
 
 Comment.belongsTo(Article, { foreignKey: 'articleId' });
 Comment.belongsTo(User, { foreignKey: 'userId' });
+Article.hasMany(Comment, { foreignKey: 'articleId' });
+User.hasMany(Comment, { foreignKey: 'userId' });
 
 module.exports =  Comment;

@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.render('index', { articles: [], hbsContent: hbsContent, moment: moment }); // Handle the error and render the view with an empty articles array
+      res.render('index', { articles: [], hbsContent: hbsContent, moment: moment }); 
     });
 });
 

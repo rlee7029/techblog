@@ -21,4 +21,5 @@ const Article = db.define('article', {
 
   Article.belongsTo(User, { foreignKey: 'userId' });
 
+
 module.exports =  Article;

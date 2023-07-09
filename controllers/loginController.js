@@ -18,7 +18,12 @@ router.post('/', (req, res) => {
       res.redirect('/login');
     } else {
       req.session.user = user.dataValues;
-      res.redirect('/');
+      console.log('req.session.previousUrl',req.session.previousUrl)
+      const redirectUrl = req.session.previousUrl || '/dashboard';
+      delete req.session.previousUrl;
+      res.redirect(redirectUrl);
+
+      
     }
   });
 });

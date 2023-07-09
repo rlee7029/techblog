@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        res.render('dashboard', { articles: [], hbsContent: hbsContent, moment: moment }); // Handle the error and render the view with an empty articles array
+        res.render('dashboard', { articles: [], hbsContent: hbsContent, moment: moment }); 
       });
  
 

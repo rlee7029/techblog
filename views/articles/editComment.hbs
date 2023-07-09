@@ -1,0 +1,12 @@
+<div class="container">
+ 
+
+  <form action="/comments/{{comment.dataValues.id}}/edit" method="POST">
+    <div class="form-group">
+<h5 class="text-center text-light bg-secondary mb-3 mt-3">Edit Comment</h5>
+      
+      <textarea class="form-control" id="comment" name="comment" rows="3" required>{{comment.dataValues.comment}}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Update Comment</button>
+  </form>
+</div>

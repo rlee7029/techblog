@@ -26,8 +26,11 @@ const sessionChecker = async (req, res, next) => {
 
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Pragma', 'no-cache');
+
+   
     res.render('index', { articles, hbsContent: hbsContent, moment:moment  });
     
+ 
   } else {
     next();
   }

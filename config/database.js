@@ -1,10 +1,17 @@
 const Sequelize = require('sequelize');
+require('dotenv').config();
+
+const dbHost = process.env.DB_HOST;
+const dbName = process.env.DB_NAME
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+
 
 // Create a new Sequelize instance with the database configuration
-const sequelize = new Sequelize('tech_blog_db', 'root','root', {
-  host: 'localhost',
+const sequelize = new Sequelize(dbName, dbUser,dbPassword, {
+  host: dbHost,
   dialect: 'mysql'
-  // Additional configuration options if necessary
+
 });
 
 // Test the database connection
@@ -29,7 +36,5 @@ sequelize.sync()
   });
 
 
-
-// Export the sequelize instance
 module.exports = sequelize;
 
